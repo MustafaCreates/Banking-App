@@ -3,8 +3,11 @@ This is a Python-based console application that simulates a simple banking syste
 
 # Features
 User authentication: Users need to provide their account number and PIN to log in to the system. The system verifies the provided credentials against the database to ensure secure access.
+
 Account operations: Once logged in, users can perform various account operations such as checking balance, depositing money, and withdrawing money.
+
 Account management: Users can create new accounts, close existing accounts, and modify account details such as name and PIN.
+
 Admin functionality: The system supports an optional "is_admin" flag while creating an account, which can be used to designate an account as an admin account. Admin accounts have additional privileges, such as closing any account in the system.
 
 # Requirements
