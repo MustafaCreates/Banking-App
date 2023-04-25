@@ -3,8 +3,8 @@ import mysql.connector
 # Connect to the database
 mydb = mysql.connector.connect(
   host="localhost",
-  user="yourusername",
-  password="yourpassword",
+  user="root",
+  password="usmaan13",
   database="banking_system"
 )
 mycursor = mydb.cursor()
@@ -91,50 +91,88 @@ def modify_account(user, field, value):
 
 # Main function to run the program
 def main():
-    # Login
     print("Welcome to the Online Banking System.")
-    account_number = input("Enter your account number: ")
-    pin = input("Enter your PIN: ")
-    user = check_login(account_number, pin)
-    if user is None:
-        print("Invalid login credentials.")
-        return
-    print("Login successful.")
-    # Main menu
+
+# Create the necessary tables if they do not exist
+    mycursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255),
+            account_number VARCHAR(255) UNIQUE,
+            pin VARCHAR(255),
+            is_admin BOOLEAN
+        )
+    """)
+    mycursor.execute("""
+        CREATE TABLE IF NOT EXISTS accounts (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            account_number VARCHAR(255),
+            balance DECIMAL(10,2)
+        )
+    """)
+    mydb.commit()
+
+
     while True:
         print("Select an option:")
-        print("1. Check balance")
-        print("2. Deposit")
-        print("3. Withdraw")
-        print("4. Create account")
-        print("5. Close account")
-        print("6. Modify account")
-        print("7. Logout")
+        print("1. Log in")
+        print("2. Sign up")
+        print("3. Exit")
         choice = input("Enter your choice: ")
         if choice == "1":
-            check_balance(user)
+            # Login
+            account_number = input("Enter your account number: ")
+            pin = input("Enter your PIN: ")
+            user = check_login(account_number, pin)
+            if user is None:
+                print("Invalid login credentials.")
+            else:
+                print("Login successful.")
+                # Main menu
+                while True:
+                    print("Select an option:")
+                    print("1. Check balance")
+                    print("2. Deposit")
+                    print("3. Withdraw")
+                    print("4. Create account")
+                    print("5. Close account")
+                    print("6. Modify account")
+                    print("7. Logout")
+                    choice = input("Enter your choice: ")
+                    if choice == "1":
+                        check_balance(user)
+                    elif choice == "2":
+                        amount = float(input("Enter the amount to deposit: "))
+                        deposit(user, amount)
+                    elif choice == "3":
+                        amount = float(input("Enter the amount to withdraw: "))
+                        withdraw(user, amount)
+                    elif choice == "4":
+                        name = input("Enter the name of the new account holder: ")
+                        account_number = input("Enter the account number for the new account: ")
+                        pin = input("Enter the PIN for the new account: ")
+                        create_account(name, account_number, pin)
+                    elif choice == "5":
+                        close_account(user)
+                        break
+                    elif choice == "6":
+                        field = input("Enter the field to modify (name or pin): ")
+                        value = input("Enter the new value: ")
+                        modify_account(user, field, value)
+                    elif choice == "7":
+                        break
+                    else:
+                        print("Invalid choice.")
+                print("Logged out.")
         elif choice == "2":
-            amount = float(input("Enter the amount to deposit: "))
-            deposit(user, amount)
-        elif choice == "3":
-            amount = float(input("Enter the amount to withdraw: "))
-            withdraw(user, amount)
-        elif choice == "4":
-            name = input("Enter the name of the new account holder: ")
-            account_number = input("Enter the account number for the new account: ")
-            pin = input("Enter the PIN for the new account: ")
+            # Sign up
+            name = input("Enter your name: ")
+            account_number = input("Enter an account number: ")
+            pin = input("Enter a PIN: ")
             create_account(name, account_number, pin)
-        elif choice == "5":
-            close_account(user)
-            break
-        elif choice == "6":
-            field = input("Enter the field to modify (name or pin): ")
-            value = input("Enter the new value: ")
-            modify_account(user, field, value)
-        elif choice == "7":
+        elif choice == "3":
+            # Exit
             break
         else:
             print("Invalid choice.")
-    print("Logged out.")
-
 main()
